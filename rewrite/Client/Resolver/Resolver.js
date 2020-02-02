@@ -5,20 +5,20 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var fs = require("fs");
-var superagent = require("superagent");
-var User = require("../../Structures/User");
-var Channel = require("../../Structures/Channel");
-var TextChannel = require("../../Structures/TextChannel");
-var VoiceChannel = require("../../Structures/VoiceChannel");
-var ServerChannel = require("../../Structures/ServerChannel");
-var PMChannel = require("../../Structures/PMChannel");
-var Role = require("../../Structures/Role");
-var Server = require("../../Structures/Server");
-var Message = require("../../Structures/Message");
-var Invite = require("../../Structures/Invite");
-var Webhook = require("../../Structures/Webhook");
-var VoiceConnection = require("../../Voice/VoiceConnection");
+const fs = require("fs");
+const superagent = require("superagent");
+const User = require("../../Structures/User");
+const Channel = require("../../Structures/Channel");
+const TextChannel = require("../../Structures/TextChannel");
+const VoiceChannel = require("../../Structures/VoiceChannel");
+const ServerChannel = require("../../Structures/ServerChannel");
+const PMChannel = require("../../Structures/PMChannel");
+const Role = require("../../Structures/Role");
+const Server = require("../../Structures/Server");
+const Message = require("../../Structures/Message");
+const Invite = require("../../Structures/Invite");
+const Webhook = require("../../Structures/Webhook");
+const VoiceConnection = require("../../Voice/VoiceConnection");
 
 class Resolver {
 	constructor(internal) {
@@ -40,7 +40,7 @@ class Resolver {
 		}
 		if (typeof resource === "string" || resource instanceof String) {
 			if (resource.indexOf("http") === 0) {
-				var split = resource.split("/");
+				const split = resource.split("/");
 				return split.pop();
 			}
 			return resource;
@@ -71,8 +71,8 @@ class Resolver {
 			return resource;
 		}
 		if (resource instanceof String || typeof resource === "string") {
-			var role = null;
-			for (var server of this.internal.servers) {
+			let role = null;
+			for (const server of this.internal.servers) {
 				if (role = server.roles.get("id", resource)) {
 					return role;
 				}
@@ -111,21 +111,21 @@ class Resolver {
 	}
 
 	resolveMentions(resource, channel) {
-		var _mentions = [];
-		var changed = resource;
-		for (var mention of resource.match(/<@\!?[0-9]+>/g) || []) {
+		const _mentions = [];
+		let changed = resource;
+		for (const mention of resource.match(/<@\!?[0-9]+>/g) || []) {
 			// username mention
 			if (mention[2] === '!') {
-				var user = this.internal.users.get("id", mention.substring(3, mention.length - 1));
+				const user = this.internal.users.get("id", mention.substring(3, mention.length - 1));
 				if (user) {
 					_mentions.push(user);
-					var details = channel.server && channel.server.detailsOf(user);
+					const details = channel.server && channel.server.detailsOf(user);
 					if (details) {
 						changed = changed.replace(new RegExp(mention, "g"), `@${details.nick || user.username + "#" + user.discriminator}`);
 					}
 				}
 			} else {
-				var user = this.internal.users.get("id", mention.substring(2, mention.length - 1));
+				const user = this.internal.users.get("id", mention.substring(2, mention.length - 1));
 				if (user) {
 					_mentions.push(user);
 					changed = changed.replace(new RegExp(mention, "g"), `@${user.username + "#" + user.discriminator}`);
@@ -133,17 +133,17 @@ class Resolver {
 			}
 		}
 		if (channel && channel.server && channel.server.roles) {
-			for (var mention of resource.match(/<@&[0-9]+>/g) || []) {
+			for (const mention of resource.match(/<@&[0-9]+>/g) || []) {
 				// role mention
-				var role = channel.server.roles.get("id", mention.substring(3, mention.length - 1));
+				const role = channel.server.roles.get("id", mention.substring(3, mention.length - 1));
 				if (role) {
 					changed = changed.replace(new RegExp(mention, "g"), `@${role.name}`);
 				}
 			}
 		}
-		for (var mention of resource.match(/<#[0-9]+>/g) || []) {
+		for (const mention of resource.match(/<#[0-9]+>/g) || []) {
 			// channel mention
-			var channel = this.internal.channels.get("id", mention.substring(2, mention.length - 1));
+			const channel = this.internal.channels.get("id", mention.substring(2, mention.length - 1));
 			if (channel) {
 				changed = changed.replace(new RegExp(mention, "g"), `#${channel.name}`);
 			}
@@ -174,7 +174,7 @@ class Resolver {
 			return resource.author;
 		}
 		if (resource instanceof TextChannel) {
-			var lmsg = resource.lastMessage;
+			const lmsg = resource.lastMessage;
 			if (lmsg) {
 				return lmsg.author;
 			}
@@ -209,7 +209,7 @@ class Resolver {
 			return Promise.resolve(resource);
 		}
 
-		var error = new Error("Could not resolve webhook");
+		const error = new Error("Could not resolve webhook");
 		// @ts-ignore
 		error.resource = resource;
 		return Promise.reject(error);
@@ -246,7 +246,7 @@ class Resolver {
 			return Promise.resolve(resource.defaultChannel);
 		}
 		if (resource instanceof String || typeof resource === "string") {
-			var user = this.internal.users.get("id", resource);
+			const user = this.internal.users.get("id", resource);
 			if (user) {
 				resource = user;
 			} else {
@@ -255,7 +255,7 @@ class Resolver {
 		}
 		if (resource instanceof User) {
 			// see if a PM exists
-			for (var pmchat of this.internal.private_channels) {
+			for (const pmchat of this.internal.private_channels) {
 				if (pmchat.recipients.length === 1 && pmchat.recipient && pmchat.recipient.equals(resource)) {
 					return Promise.resolve(pmchat);
 				}
@@ -264,11 +264,10 @@ class Resolver {
 			// PM does not exist :\
 			return this.internal.startPM(resource);
 		}
-		var error = new Error("Could not resolve channel");
+		const error = new Error("Could not resolve channel");
 		// @ts-ignore
 		error.resource = resource;
 		return Promise.reject(error);
 	}
 }
-exports.default = Resolver;
-//# sourceMappingURL=Resolver.js.map
+module.exports = Resolver;
