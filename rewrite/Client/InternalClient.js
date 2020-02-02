@@ -153,7 +153,7 @@ class InternalClient {
 		this.setupCalled = true;
 		discordClient = discordClient || this.client;
 		this.client = discordClient;
-		this.state = ConnectionState.default.IDLE;
+		this.state = ConnectionState.IDLE;
 		this.websocket = null;
 		this.erlpack = discordClient.options.erlpack;
 		this.zlib = discordClient.options.zlib;
@@ -186,7 +186,7 @@ class InternalClient {
 		};
 
 		this.voiceConnections = new Cache();
-		this.resolver = new Resolver.default(this);
+		this.resolver = new Resolver(this);
 		this.readyTime = null;
 		this.messageAwaits = {};
 		this.buckets = {
@@ -561,7 +561,7 @@ class InternalClient {
 			this.setup();
 		}
 
-		this.state = ConnectionState.default.LOGGED_IN;
+		this.state = ConnectionState.LOGGED_IN;
 		this.token = token;
 		this.email = email;
 		this.password = password;
@@ -592,11 +592,11 @@ class InternalClient {
 			}
 		}
 
-		if (this.state !== ConnectionState.default.DISCONNECTED && this.state !== ConnectionState.default.IDLE) {
+		if (this.state !== ConnectionState.DISCONNECTED && this.state !== ConnectionState.IDLE) {
 			return Promise.reject(new Error("already logging in/logged in/ready!"));
 		}
 
-		this.state = ConnectionState.default.LOGGING_IN;
+		this.state = ConnectionState.LOGGING_IN;
 
 		return this.apiRequest("post", Constants.Endpoints.LOGIN, false, {
 			email,
@@ -611,7 +611,7 @@ class InternalClient {
 			throw error;
 		}).catch(error => {
 			this.websocket = null;
-			this.state = ConnectionState.default.DISCONNECTED;
+			this.state = ConnectionState.DISCONNECTED;
 			client.emit("disconnected");
 			throw error;
 		});
@@ -619,7 +619,7 @@ class InternalClient {
 
 	// def logout
 	logout() {
-		if (this.state === ConnectionState.default.DISCONNECTED || this.state === ConnectionState.default.IDLE) {
+		if (this.state === ConnectionState.DISCONNECTED || this.state === ConnectionState.IDLE) {
 			return Promise.reject(new Error("Client is not logged in!"));
 		}
 
@@ -631,7 +631,7 @@ class InternalClient {
 			this.token = null;
 			this.email = null;
 			this.password = null;
-			this.state = ConnectionState.default.DISCONNECTED;
+			this.state = ConnectionState.DISCONNECTED;
 			return Promise.resolve();
 		};
 
@@ -1634,7 +1634,7 @@ class InternalClient {
 
 		this.websocket.onclose = event => {
 			this.websocket = null;
-			this.state = ConnectionState.default.DISCONNECTED;
+			this.state = ConnectionState.DISCONNECTED;
 			if (event && event.code) {
 				this.client.emit("warn", "WS close: " + event.code);
 				let err;
@@ -1669,7 +1669,7 @@ class InternalClient {
 		this.websocket.onerror = e => {
 			this.client.emit("error", e);
 			this.websocket = null;
-			this.state = ConnectionState.default.DISCONNECTED;
+			this.state = ConnectionState.DISCONNECTED;
 			this.disconnected(this.client.options.autoReconnect);
 		};
 
@@ -1729,7 +1729,7 @@ class InternalClient {
 			case Constants.PacketType.READY:
 				{
 					this.autoReconnectInterval = 1000;
-					this.state = ConnectionState.default.READY;
+					this.state = ConnectionState.READY;
 
 					if (packet.t === Constants.PacketType.RESUMED) {
 						break;
