@@ -1,6 +1,15 @@
 {
     "compilerOptions": {
         "target": "ES6",
-        "module": "commonjs"
-    }
+        "module": "commonjs",
+    },
+    "exclude": [
+        "./docs",
+        "./examples",
+        "./lib",
+        "./libv4",
+        "./src",
+        "./test",
+        "./web-dist"
+    ]
 }

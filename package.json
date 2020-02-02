@@ -2,7 +2,7 @@
   "name": "discordv8",
   "version": "8.4.2",
   "description": "A way to interface with the Discord API",
-  "main": "./entrypoint.js",
+  "main": "./index.js",
   "scripts": {
     "test": "eslint *.js src test && node test/lib-test.js",
     "build": "grunt --dev && grunt --v4 --dev"
